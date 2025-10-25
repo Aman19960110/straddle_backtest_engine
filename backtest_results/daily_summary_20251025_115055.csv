@@ -1,0 +1,2 @@
+date,PnL,num_trades,exit_reasons,CumulativePnL,winning_trades,losing_trades
+2025-10-24,877.5000000000011,6,"{'StopLoss': 5, 'Exit': 1}",877.5000000000011,4,2
