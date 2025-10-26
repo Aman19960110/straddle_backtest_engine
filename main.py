@@ -8,6 +8,7 @@ import pandas as pd
 from datetime import timedelta, datetime
 from typing import List
 import os
+import numpy as np
 
 class BacktestEngine:
     """Main backtesting engine for straddle strategy"""
@@ -97,6 +98,7 @@ class BacktestEngine:
                         "ExitReason": exit_reason,
                         "EntryTime": current_time,
                         "ExitTime": exit_time,
+                        "expiry" : expiry
                     }
                     self.results.append(trade)
                     self.minute_pnl_records[f"{date}_reentry_{reentry}"] = pnl_df
@@ -135,11 +137,8 @@ class BacktestEngine:
         # Create results DataFrame
         results_df = pd.DataFrame(self.results)
         
-        # Export results to CSV
-        if not results_df.empty:
-            self.export_results_to_csv(results_df)
-        
-        return results_df
+
+
     
     def export_results_to_csv(self, df: pd.DataFrame):
         """
@@ -156,7 +155,32 @@ class BacktestEngine:
         export_df = df.copy()
         export_df["EntryTime"] = pd.to_datetime(export_df["EntryTime"]).dt.strftime("%Y-%m-%d %H:%M:%S")
         export_df["ExitTime"] = pd.to_datetime(export_df["ExitTime"]).dt.strftime("%Y-%m-%d %H:%M:%S")
-        
+        export_df['date'] = pd.to_datetime(export_df['date'], errors='coerce')
+        export_df['weekday'] = export_df['date'].dt.day_name()
+
+
+        conditions_1 = [
+        (export_df['weekday'] == 'Tuesday') & (export_df['date'] <= '2025-09-01'),
+        (export_df['weekday'] == 'Wednesday')&(export_df['date'] <= '2025-09-01'),
+        (export_df['weekday'] == 'Thursday')&(export_df['date'] <= '2025-09-01'),
+        (export_df['weekday'] == 'Friday')&(export_df['date'] <= '2025-09-01'),
+        (export_df['weekday'] == 'Monday')&(export_df['date'] <= '2025-09-01')
+        ]
+        choices_1 = [2,1,0,4,3]
+
+        export_df['trading_dy_typ'] = np.select(conditions_1, choices_1, default=np.nan)        
+
+
+        conditions = [
+        (export_df['weekday'] == 'Tuesday') & (export_df['date'] >= '2025-09-01'),
+        (export_df['weekday'] == 'Wednesday')&(export_df['date'] >= '2025-09-01'),
+        (export_df['weekday'] == 'Thursday')&(export_df['date'] >= '2025-09-01'),
+        (export_df['weekday'] == 'Friday')&(export_df['date'] >= '2025-09-01'),
+        (export_df['weekday'] == 'Monday')&(export_df['date'] >= '2025-09-01')
+        ]
+        choices = [0,4,3,2,1]
+
+        export_df['trading_dy_typ'] = np.select(conditions, choices, default=np.nan)
         # Add cumulative P&L
         export_df["CumulativePnL"] = export_df.groupby("date")["PnL"].cumsum()
         
@@ -332,27 +356,38 @@ class BacktestEngine:
     
     def export_all_intraday_pnl(self):
         """
-        Export all intraday P&L records to separate CSV files
+        Export all intraday P&L records into a single combined CSV file
+        (adds a 'key' column to identify each source DataFrame)
         """
         if not self.minute_pnl_records:
             print("⚠️ No intraday P&L records to export")
             return
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
+        combined_data = []  # To hold all dataframes before concatenation
+
         for key, df in self.minute_pnl_records.items():
-            filename = f"{self.output_dir}/intraday_pnl_{key}_{timestamp}.csv"
+            if df.empty:
+                continue
             
             export_df = df.copy()
-            export_df["datetime"] = pd.to_datetime(export_df["datetime"]).dt.strftime("%Y-%m-%d %H:%M:%S")
-            
-            export_df.to_csv(filename, index=False)
-            print(f"✅ Exported: {filename}")
-        
-        print(f"\n✅ All intraday P&L records exported to: {self.output_dir}/")
+            export_df["key"] = key  # 👈 Add key column
+            export_df["datetime"] = pd.to_datetime(export_df["datetime"], errors="coerce").dt.strftime("%Y-%m-%d %H:%M:%S")
+            combined_data.append(export_df)
+
+        # Concatenate all dataframes
+        if not combined_data:
+            print("⚠️ All P&L records were empty — nothing to export.")
+            return
+
+        final_df = pd.concat(combined_data, ignore_index=True)
+        filename = f"{self.output_dir}/intraday_pnl_all_{timestamp}.csv"
+
+        final_df.to_csv(filename, index=False)
+        print(f"\n✅ Exported combined intraday P&L to: {filename}")
+        print(f"📊 Total records: {len(final_df)} from {len(self.minute_pnl_records)} files.")
 
 
-# Usage Example
 if __name__ == "__main__":
     # Load configuration
     config = StraddleConfig.from_yaml()
@@ -360,29 +395,43 @@ if __name__ == "__main__":
     # Initialize backtest engine
     engine = BacktestEngine(config)
     
-    # Define backtest parameters
+    # Define backtest schedule
     symbol = "NIFTY"
-    expiry = "2025-10-28"
-    dates = ["2025-10-24"]
-    
-    # Run backtest (automatically exports results_df to CSV)
-    results_df = engine.run_backtest(symbol, expiry, dates)
-    
-    # Print and export summary (automatically exports daily summary and metrics to CSV)
-    results_df, daily_df, metrics = engine.summary(export_csv=True)
-    
-    # Get and export intraday P&L for specific date
-    intraday_pnl = engine.get_intraday_pnl("2025-10-24", reentry=0, export_csv=True)
-    
-    if intraday_pnl is not None:
-        print("\n📉 Intraday P&L Sample:")
-        print(intraday_pnl.head(10))
-    
-    # Export all intraday P&L records at once
-    engine.export_all_intraday_pnl()
-    
-    print("\n✅ All CSV files have been exported to 'backtest_results/' folder")
+    backtest_schedule = [
+        ('2025-10-01', '2025-10-07'),
+        ('2025-10-02', '2025-10-07'), 
+        ('2025-10-03', '2025-10-07'), 
+        ('2025-10-06', '2025-10-07'), 
+        ('2025-10-07', '2025-10-07'), 
+        ('2025-10-08', '2025-10-14'), 
+        ('2025-10-09', '2025-10-14'), 
+        ('2025-10-10', '2025-10-14'), 
+        ('2025-10-13', '2025-10-14'), 
+        ('2025-10-14', '2025-10-14'), 
+        ('2025-10-15', '2025-10-20'), 
+        ('2025-10-16', '2025-10-20'), 
+        ('2025-10-17', '2025-10-20'), 
+        ('2025-10-20', '2025-10-20'), 
+    ]
 
+    # Run all backtests (no exports inside loop)
+    for date, expiry in backtest_schedule:
+        print(f"\n🚀 Running backtest for {date} | Expiry {expiry}")
+        engine.run_backtest(symbol=symbol, expiry=expiry, dates=[date])
+
+    # ✅ Single combined export
+    if engine.results:
+        combined_df = pd.DataFrame(engine.results)
+        print(f"\n📈 Total Trades: {len(combined_df)} across {len(backtest_schedule)} sessions")
+
+        # Export consolidated results
+        engine.export_results_to_csv(combined_df)
+        engine.summary(export_csv=True)
+        engine.export_all_intraday_pnl()
+
+        print("\n✅ Single consolidated report generated in 'backtest_results/' folder")
+    else:
+        print("⚠️ No trades found — check data or strategy settings.")
 
 
 
