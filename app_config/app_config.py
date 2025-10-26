@@ -20,6 +20,7 @@ class StraddleConfig:
     # Straddle Settings
     strike_selection: str = "ATM"
     lot_size: int = 75
+    lot_multiplier:int = 1
 
     # Risk Management
     stop_loss_pct: float = 25.0
