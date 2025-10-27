@@ -16,7 +16,6 @@ dependencies = [
     "numpy",
     "tqdm",
     "pytz",
-    "itertools",
     "datetime",
     "typing",
     "os",
