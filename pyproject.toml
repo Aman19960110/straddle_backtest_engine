@@ -16,9 +16,6 @@ dependencies = [
     "numpy",
     "tqdm",
     "pytz",
-    "datetime",
-    "typing",
-    "os",
     "quantstats",
     "yfinance",
     "breeze_connect"
