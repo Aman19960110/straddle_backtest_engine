@@ -22,10 +22,6 @@ dependencies = [
     "quantstats",
     "yfinance",
     "breeze_connect"
-
-
-
-
 ]
 
 [tool.setuptools.packages.find]
