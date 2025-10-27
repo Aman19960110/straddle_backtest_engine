@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "straddle_backtest_engine"
+version = "0.1.0"
+description = "A modular backtesting engine for straddle strategies with stop loss, take profit, and reentry logic."
+authors = [{ name = "Aman" }]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.8"
+
+dependencies = [
+    "pandas",
+    "numpy",
+    "tqdm",
+    "pytz",
+    "itertools",
+    "datetime",
+    "typing",
+    "os",
+    "quantstats",
+    "yfinance",
+    "breeze_connect"
+
+
+
+
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
