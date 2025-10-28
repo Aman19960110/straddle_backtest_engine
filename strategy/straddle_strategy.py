@@ -94,8 +94,8 @@ class StraddleStrategy:
         net_pnl *= self.lot_size * self.lot_multiplier
         gross_pnl *= self.lot_size * self.lot_multiplier
 
-        # Deduct commission (2 legs per trade)
-        total_commission = 2 * self.commission_per_lot * self.lot_multiplier
+        # Deduct commission (4 legs per trade)
+        total_commission = 4 * self.commission_per_lot * self.lot_multiplier
         net_pnl -= total_commission
 
         # ==============================

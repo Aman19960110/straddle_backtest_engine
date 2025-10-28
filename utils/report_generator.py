@@ -5,7 +5,7 @@ import quantstats as qs
 import yfinance as yf
 import os
 
-def generate_report(backtest_csv_path: str, start_date: str = "2025-01-01", end_date: str = "2025-10-14",
+def generate_report(backtest_csv_path: str,
                     initial_capital: float = 400000, rf_rate: float = 0.06):
     """
     Generate QuantStats performance report comparing strategy vs NIFTY.
@@ -30,6 +30,11 @@ def generate_report(backtest_csv_path: str, start_date: str = "2025-01-01", end_
     # ===============================
     # 📊 Load NIFTY benchmark data
     # ===============================
+    data = pd.read_csv(backtest_csv_path, parse_dates=["date"], index_col="date")
+    start_date = data.index[0].strftime('%Y-%m-%d')
+    end_date = data.index[-1].strftime('%Y-%m-%d')
+
+
     print("📥 Downloading NIFTY benchmark data...")
     nifty = yf.download("^NSEI", start=start_date, end=end_date)
     nifty_returns = nifty["Close"].pct_change().dropna()
@@ -38,7 +43,7 @@ def generate_report(backtest_csv_path: str, start_date: str = "2025-01-01", end_
     # 📄 Load backtest results
     # ===============================
     print(f"📂 Reading backtest CSV: {backtest_csv_path}")
-    data = pd.read_csv(backtest_csv_path, parse_dates=["date"], index_col="date")
+    
 
     # Ensure columns exist
     if not all(col in data.columns for col in ["net_PnL", "gross_pnl"]):
