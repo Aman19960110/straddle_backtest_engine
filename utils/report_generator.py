@@ -5,8 +5,7 @@ import quantstats as qs
 import yfinance as yf
 import os
 
-def generate_report(backtest_csv_path: str,
-                    initial_capital: float = 400000, rf_rate: float = 0.06):
+def generate_report(backtest_csv_path: str,initial_capital: float = 400000, rf_rate: float = 0.06):
     """
     Generate QuantStats performance report comparing strategy vs NIFTY.
 
