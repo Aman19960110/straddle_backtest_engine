@@ -151,7 +151,7 @@ else:
 - You can load and analyze results later using pandas.
 ### 🔗 Live HTML Preview
 
-[![2025 Backtest Report Preview](assets/screencapture-file-C-Users-amany-OneDrive-Desktop-python-projects-straddle-backtest-engine-assets-net-returns-report-html-2025-11-01-14_53_37.png)](assets/net_returns_report.html)
+[![2025 Backtest Report Preview](assets/screencapture-file-C-Users-amany-OneDrive-Desktop-python-projects-straddle-backtest-engine-assets-net-returns-report-html-2025-11-01-14_53_37.png)](https://raw.githubusercontent.com/Aman19960110/straddle_backtest_engine/main/assets/net_returns_report.html)
 
 ---
 
