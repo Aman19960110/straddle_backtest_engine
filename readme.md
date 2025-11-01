@@ -151,7 +151,7 @@ else:
 - You can load and analyze results later using pandas.
 ### 🔗 Live HTML Preview
 
-[2025 backtest report](assets\net_returns_report.html)
+[![2025 Backtest Report Preview](assets/screencapture-file-C-Users-amany-OneDrive-Desktop-python-projects-straddle-backtest-engine-assets-net-returns-report-html-2025-11-01-14_53_37.png)](assets/net_returns_report.html)
 
 ---
 
@@ -191,5 +191,5 @@ For contributions or issues, open a GitHub issue or PR.
 
 ---
 
-Would you like me to add an **example YAML** and **sample Colab notebook** to the repo so others can reproduce this workflow easily?
+
 
