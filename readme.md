@@ -151,7 +151,7 @@ else:
 - You can load and analyze results later using pandas.
 ### 🔗 Live HTML Preview
 
-[2025 backtest report]('assets\net_returns_report.html')
+[2025 backtest report](assets\net_returns_report.html)
 
 ---
 
