@@ -18,6 +18,7 @@ A modular backtesting engine for straddle option strategies focused on Indian de
 
 ```
 straddle_backtest_engine/
+├── assets                 # 2025 backtest data
 ├── app_config/            # Configuration files and YAML settings
 ├── backtest_results/      # Output of backtests (PnL, logs, summaries)
 ├── data/                  # Input market data (NSE options/futures)
@@ -148,6 +149,9 @@ else:
 - All generated reports, trade logs, and summaries are stored in the `backtest_results/` folder.
 - Logs for each run are stored under `logs/`.
 - You can load and analyze results later using pandas.
+### 🔗 Live HTML Preview
+
+[2025 backtest report]('assets\net_returns_report.html')
 
 ---
 
